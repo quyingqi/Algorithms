@@ -72,8 +72,64 @@ class BinaryTreeTraversal:
         return res
 
     # postorder
-    def postorderTraversal_2(self, root):
-        pass
+    def postorderTraversal_2_1(self, root):
+        res = []
+        stack = []
+        flag = [] # 记录栈里的节点是第几次走到（因为根节点要在第二次走到时才能访问）
+        while(root or stack):
+            if root: # 如果当前节点不为空，则入栈，往左走
+                stack.append(root)
+                flag.append(0)
+                root = root.left
+            else:  # 如果当前节点为空，则看栈顶节点
+                f = flag.pop()
+                if f == 0: # 如果栈顶节点是第一次走到，则往它的右孩子走
+                    flag.append(1)
+                    root = stack[-1].right
+                else:  # 如果栈顶节点是第二次走到，则访问它，root置为空
+                    node = stack.pop()
+                    res.append(node.val)
+                    root = None
+        return res
+
+    def postorderTraversal_2_2(self, root):
+        res = []
+        stack = []
+        output = []  # 按照后序遍历的倒序 保存节点
+        while(root or stack):
+            if root: # 如果当前节点不为空，则入栈，往右走
+                stack.append(root)
+                output.append(root)
+                root = root.right
+            else:  # 如果当前节点为空，则往栈顶节点的左边走
+                node = stack.pop()
+                root = node.left
+        while(output):
+            res.append(output.pop().val)
+        return res
+
+    def postorderTraversal_2_3(self, root):
+        res = []
+        stack = []
+        pre = None # 记录上一个访问的节点
+        while(root or stack):
+            # 如果是叶子节点 或者上一个访问的是其右孩子 或上一个访问的是其左孩子且右孩子为空，则访问该节点
+            if not root.left and not root.right or (pre and (pre == root.right or (pre == root.left and not root.right))):
+                res.append(root.val)
+                pre = root
+                if stack:
+                    root = stack.pop() # 出栈
+                else:
+                    root = None
+            else:
+                stack.append(root)  # 入栈
+                if pre == root.left: # 如果上一个访问的是其左孩子，则转到右边
+                    root = root.right
+                elif root.left:
+                    root = root.left # 否则，一直往左走
+                elif root.right:
+                    root = root.right # 左边走到头，再往右走
+        return res
 
     ##------------------------------------------------------##
     # 3.Morris Traversal
