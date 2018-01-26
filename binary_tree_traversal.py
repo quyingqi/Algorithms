@@ -179,4 +179,31 @@ class BinaryTreeTraversal:
 
     # postorder
     def postorderTraversal_3(self, root):
-        pass
+        res = []
+        head = TreeNode(0)
+        head.left = root
+        root = head
+        while(root):
+            if root.left: # 如果有左孩子
+                # 找前驱节点
+                pre = root.left
+                while(pre.right and pre.right != root):
+                    pre = pre.right
+
+                if pre.right == root: # 如果已经连接过，则重置回去，并依次访问从前驱节点到其左孩子这条路径上的所有节点
+                    pre.right = None
+                    stack = []
+                    tmp = root.left
+                    while(tmp):
+                        stack.append(tmp)
+                        tmp = tmp.right
+                    while(stack):
+                        res.append(stack.pop().val)
+
+                    root = root.right
+                else:
+                    pre.right = root # 如果没有连接过，将前驱节点指向当前节点
+                    root = root.left # 往左走
+            else:
+                root = root.right
+        return res
