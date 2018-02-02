@@ -68,9 +68,6 @@ def findNN(root, query):
     :param query: 查询点
     :return: 返回距离data最近的点NN，同时返回最短距离min_dist
     '''
-    #初始化为root的节点
-    NN = root.val # 记录最近的节点
-    min_dist = computeDist(query, NN) # 记录最近节点到query的距离
     nodeList = [] # 记录走过的路径
     tmp_root = root
 
@@ -78,21 +75,24 @@ def findNN(root, query):
     while(tmp_root):
         nodeList.append(tmp_root)
         print(tmp_root.val)
-        dd = computeDist(query, tmp_root.val)
-        if dd < min_dist:
-            min_dist = dd
-            NN = tmp_root.val
-        # 当前节点的划分域
         ss = tmp_root.split
         if query[ss] <= tmp_root.val[ss]:
             tmp_root = tmp_root.left
         else:
             tmp_root = tmp_root.right
 
+    #初始化为最后的叶子节点
+    NN = nodeList.pop().val # 记录最近的节点
+    min_dist = computeDist(query, NN) # 记录最近节点到query的距离
+
     # 回溯查找
     while(nodeList):
         back_val = nodeList.pop()
         ss = back_val.split
+        curDist = computeDist(query, back_val.val)
+        if curDist < min_dist:
+            min_dist = curDist
+            NN = back_val.val
 
         # 判断是否需要进入父亲节点的子空间进行搜索
         if abs(query[ss] - back_val.val[ss]) < min_dist:
@@ -100,13 +100,14 @@ def findNN(root, query):
                 tmp_root = back_val.right
             else:
                 tmp_root = back_val.left
-
-            if tmp_root:
+            while(tmp_root):
                 nodeList.append(tmp_root)
-                curDist = computeDist(query, tmp_root.val)
-                if curDist < min_dist:
-                    min_dist = curDist
-                    NN = tmp_root.val
+                print(tmp_root.val)
+                ss = tmp_root.split
+                if query[ss] <= tmp_root.val[ss]:
+                    tmp_root = tmp_root.left
+                else:
+                    tmp_root = tmp_root.right
 
     return NN, min_dist
 
@@ -121,7 +122,7 @@ def computeDist(pt1, pt2):
     return dist
 
 if __name__ == '__main__':
-    data_list = [(1,5),(2,7),(3,1),(4,6),(5,3),(6,2),(6,4),(7,7)]
+    data_list = [(2,3),(5,4),(9,6),(4,7),(8,1),(7,2)]
     root = create_kdTree(data_list)
-    NN, min_dist = findNN(root, (3,2))
+    NN, min_dist = findNN(root, (6.9,0.5))
     print(NN, min_dist)
