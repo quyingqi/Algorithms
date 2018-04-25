@@ -9,18 +9,19 @@ class ListNode(object):
         self.next = None
 
 class Solution(object):
-    def sortList(self, head):
+
+    #用快排实现链表的排序
+    def quick_sort(self, head):
         """
         :type head: ListNode
         :rtype: ListNode
         """
         if not head:
             return None
-        head, tail = self.iter(head, None)
+        head, tail = self.quick_sort_iter(head, None)
         return head
 
-    #用快排实现链表的排序
-    def iter(self, head, tail):
+    def quick_sort_iter(self, head, tail):
         flag = head     #第一个数作为比较对象
         i = head.next
         left, right = ListNode(0), ListNode(0) #记录比flag小的数、大的数的头节点
@@ -38,17 +39,53 @@ class Solution(object):
             i = i.next
 
         if left.next: # 如果有比flag小的数，则对左边的部分递归，得到排序后的头和尾
-            l_head, l_tail = self.iter(left.next, li.next)
+            l_head, l_tail = self.quick_sort_iter(left.next, li.next)
             l_tail.next = flag
         else:       # 否则，头节点就是flag
             l_head = flag
         if right.next: # 如果有比flag大的数，则对右边的部分递归，得到排序后的头和尾
-            r_head, r_tail = self.iter(right.next, ri.next)
+            r_head, r_tail = self.quick_sort_iter(right.next, ri.next)
             fi.next = r_head
         else:       # 否则，尾节点就是flag
             fi.next = None
             r_tail = fi
         return l_head, r_tail
+
+    # 用归并排序实现
+    def merge_sort(self, head):
+        if not head:
+            return None
+        slow, fast = head, head # 用快慢指针找到中间点，分成两部分
+        pre = head
+        while(fast and fast.next):
+            pre = slow
+            slow = slow.next
+            fast = fast.next.next
+        pre.next = None
+        if head != slow: # 只剩一个元素时，不用处理
+            left = self.merge_sort(head) # 对两部分分别进行排序
+            right = self.merge_sort(slow)
+            head = self.merge(left, right) # 再合并两部分
+        return head
+
+    def merge(self, l, r):
+        li, ri = l, r
+        new_head = ListNode(0)
+        i = new_head
+        while(li and ri):
+            if li.val < ri.val:
+                i.next = li
+                li = li.next
+                i = i.next
+            else:
+                i.next = ri
+                ri = ri.next
+                i = i.next
+        if li:
+            i.next = li
+        if ri:
+            i.next = ri
+        return new_head.next
 
 if __name__ == '__main__':
     s = Solution()
@@ -58,7 +95,7 @@ if __name__ == '__main__':
     for i in list:
         tmp.next = ListNode(i)
         tmp = tmp.next
-    res = s.sortList(li)
+    res = s.merge_sort(li)
     r = []
     while(res):
         r.append(res.val)
