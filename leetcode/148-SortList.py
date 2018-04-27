@@ -89,7 +89,7 @@ class Solution(object):
 
 if __name__ == '__main__':
     s = Solution()
-    list = range(0,5000)
+    list = [5,4,7,3,8,6,2]
     li = ListNode(1)
     tmp = li
     for i in list:
